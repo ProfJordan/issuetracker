@@ -92,18 +92,18 @@ module.exports = function (app) {
       try {
           const projectModel = await ProjectModel.findOne({ name: projectName });
           if (!projectModel) {
-              throw new Error('Project not found');
+              throw new Error('project not found');
           }
   
           const result = await IssueModel.deleteOne({ _id: _id, projectId: projectModel._id });
           if (result.deletedCount === 0) {
-              throw new Error('ID not found. Could not delete ' + _id);
+              throw new Error('ID not found.');
           }
   
-          res.json({ result: 'Successfully deleted', _id: _id });
+          res.json({ result: 'successfully deleted', '_id': _id });
       } catch (error) {
           console.error('Error deleting issue:', error.message);
-          res.status(500).json({ error: 'Could not delete', _id: _id });
+          res.status(500).json({ error: 'could not delete', '_id': _id });
       }
   });
   
