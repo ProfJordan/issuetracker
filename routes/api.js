@@ -5,7 +5,7 @@ module.exports = function (app) {
   const ProjectModel = require('../models.js').Project;
   const IssueModel = require('../models.js').Issue;
 
-  app.route('/api/issues/:project')
+  app.route('/api/issues/:project/')
   
     .get(async (req, res) => {
       let projectName = req.params.project;
@@ -83,9 +83,28 @@ module.exports = function (app) {
       
     })
     
-    .delete(function (req, res){
-      let project = req.params.project;
-      
-    });
-    
+    .delete(async (req, res) => {
+      let projectName = req.params.project;
+      const { _id } = req.body;
+  if (!_id) {
+          return res.json({ error: 'missing _id' });
+      }
+      try {
+          const projectModel = await ProjectModel.findOne({ name: projectName });
+          if (!projectModel) {
+              throw new Error('Project not found');
+          }
+  
+          const result = await IssueModel.deleteOne({ _id: _id, projectId: projectModel._id });
+          if (result.deletedCount === 0) {
+              throw new Error('ID not found. Could not delete ' + _id);
+          }
+  
+          res.json({ result: 'Successfully deleted', _id: _id });
+      } catch (error) {
+          console.error('Error deleting issue:', error.message);
+          res.status(500).json({ error: 'Could not delete', _id: _id });
+      }
+  });
+  
 };
