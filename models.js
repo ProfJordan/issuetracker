@@ -11,6 +11,7 @@ const IssueSchema = new Schema({
   assigned_to: String, // {type: String}
   open: Boolean, // {type: Boolean, default: true}
   status_text: String,
+  project: { type: Schema.Types.ObjectId, ref: "Project" },
 });
 
 const Issue = mongoose.model('Issue', IssueSchema);

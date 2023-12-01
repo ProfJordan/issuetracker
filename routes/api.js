@@ -83,28 +83,51 @@ module.exports = function (app) {
       
     })
     
-    .delete(async (req, res) => {
-      let projectName = req.params.project;
-      const { _id } = req.body;
-  if (!_id) {
-          return res.json({ error: 'missing _id' });
-      }
-      try {
-          const projectModel = await ProjectModel.findOne({ name: projectName });
-          if (!projectModel) {
-              throw new Error('project not found');
-          }
+  //   .delete(async (req, res) => {
+  //     let projectName = req.params.project;
+  //     const { _id } = req.body;
+  // if (!_id) {
+  //         return res.json({ error: 'missing _id' });
+  //     }
+  //     try {
+  //         const projectModel = await ProjectModel.findOne({ name: projectName });
+  //         if (!projectModel) {
+  //             throw new Error('project not found');
+  //         }
   
-          const result = await IssueModel.deleteOne({ _id: _id, projectId: projectModel._id });
-          if (result.deletedCount === 0) {
-              throw new Error('ID not found.');
-          }
+  //         const result = await IssueModel.deleteOne({ _id: _id, projectId: projectModel._id });
+  // if (result.deletedCount === 0) {
+  //             throw new Error('ID not found.');
+  //         }
   
-          res.json({ result: 'successfully deleted', '_id': _id });
-      } catch (error) {
-          console.error('Error deleting issue:', error.message);
-          res.status(500).json({ error: 'could not delete', '_id': _id });
-      }
-  });
+  //         res.json({ result: 'successfully deleted', '_id': _id });
+  //     } catch (error) {
+  //         console.error('Error deleting issue:', error.message);
+  //         res.status(500).json({ error: 'could not delete', '_id': _id });
+  //     }
+  // });
+
+  .delete(async (req, res) => {
+    const projectName = req.params.project;
+    if (req.body._id === undefined) {
+        res.json({ error: 'missing _id' });
+    } else {
+        const reqId = req.body._id;
+        try {
+            let findProject = await ProjectModel
+                .findOne({ name: projectName })
+            let deleteIssue = await IssueModel
+                .deleteOne({ projectId: findProject._id, _id: reqId })
+            if (deleteIssue.deletedCount == 0) {
+                res.json({ error: 'could not delete', '_id': reqId });
+            } else {
+                res.json({ result: 'successfully deleted', '_id': reqId });
+            }
+        } catch (err) {
+            console.log(err);
+            res.json({ error: 'could not delete', '_id': reqId });
+        }
+    }
+})
   
 };
